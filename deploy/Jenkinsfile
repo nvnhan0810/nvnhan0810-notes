@@ -20,7 +20,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 stop blog-nvnhan0810\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 stop blog-nvnhan0810 > /dev/null\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 delete blog-nvnhan0810 > /dev/null\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 --name blog-nvnhan0810 start npm -- start\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && sudo systemctl reload nginx\"'
