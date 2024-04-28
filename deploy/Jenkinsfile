@@ -9,7 +9,7 @@ pipeline {
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/blog.nvnhan0810.com-zip.zip && mv /var/lib/jenkins/blog.nvnhan0810.com-zip.zip /var/www/html/\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/blog.nvnhan0810.com-zip && mkdir /var/www/html/blog.nvnhan0810.com-zip\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && pwd && ls -la && unzip blog.nvnhan0810.com-zip -d blog.nvnhan0810.com-zip\"'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && cp -rTf blog.nvnhan0810.com-zip blog.nvnhan0810.com'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && cp -rTf blog.nvnhan0810.com-zip blog.nvnhan0810.com\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && npm install\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && npm run build\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf\"'
