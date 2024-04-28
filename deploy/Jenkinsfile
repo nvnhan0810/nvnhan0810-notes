@@ -5,12 +5,12 @@ pipeline {
         stage('Build') {
             steps {
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no cd /var/www/html/blog.nvnhan0810.com'
-                    sh 'ssh -o StrictHostKeyChecking=no git pull origin main'
-                    sh 'ssh -o StrictHostKeyChecking=no fnm use'
-                    sh 'ssh -o StrictHostKeyChecking=no npm install'
-                    sh 'ssh -o StrictHostKeyChecking=no npm run build'
-                    sh 'ssh -o StrictHostKeyChecking=no cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 git pull origin main'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 fnm use'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 npm install'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 npm run build'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf'
                 }
             }
         }
@@ -18,10 +18,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no pm2 stop blog-nvnhan0810'
-                    sh 'ssh -o StrictHostKeyChecking=no pm2 delete blog-nvnhan0810'
-                    sh 'ssh -o StrictHostKeyChecking=no pm2 --name blog-nvnhan0810 start npm -- start'
-                    sh 'ssh -o StrictHostKeyChecking=no sudo systemctl reload nginx'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 pm2 stop blog-nvnhan0810'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 pm2 delete blog-nvnhan0810'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 pm2 --name blog-nvnhan0810 start npm -- start'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 sudo systemctl reload nginx'
                 }
             }
         }
