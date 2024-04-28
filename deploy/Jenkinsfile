@@ -9,14 +9,16 @@ pipeline {
                 sh 'fnm use'
                 sh 'npm install'
                 sh 'npm run build'
+                sh 'cp deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'pm2 stop blog-nvnhan0810'
-                sh 'pm2 delete blog-nvnhan0810'
-                sh 'pm2 --name blog-nvnhan0810 start npm -- start'
+                sh 'sudo pm2 stop blog-nvnhan0810'
+                sh 'sudo pm2 delete blog-nvnhan0810'
+                sh 'sudo pm2 --name blog-nvnhan0810 start npm -- start'
+                sh 'sudo systemctl reload nginx'
             }
         }
     }
