@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'zip -r /var/lib/jenkins/blog.nvnhan0810.com-zip.zip ,/'
+                sh 'zip -r /var/lib/jenkins/blog.nvnhan0810.com-zip.zip ./'
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/lib/jenkins && unzip blog.nvnhan0810.com-zip.zip'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/lib/jenkins && cp -rTf blog.nvnhan0810.com-zip/* /var/www/html/blog.nvnhan0810.com'
