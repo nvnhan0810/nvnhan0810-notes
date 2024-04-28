@@ -4,8 +4,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                sh 'cp -rT ./ /var/www/html/blog.nvnhan0810.com'
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && git pull origin main'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && fnm use'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && npm install'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && npm run build'
