@@ -4,13 +4,19 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'This is build stage'
+                sh 'cd /var/www/html/blog.nvnhan0810.com'
+                sh 'git pull origin main'
+                sh 'fnm use'
+                sh 'npm install'
+                sh 'npm run build'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'This is deploy stage'
+                sh 'pm2 stop blog-nvnhan0810'
+                sh 'pm2 delete blog-nvnhan0810'
+                sh 'pm2 --name blog-nvnhan0810 start npm -- start'
             }
         }
     }
