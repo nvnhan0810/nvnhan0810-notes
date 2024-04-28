@@ -4,16 +4,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'zip -r /var/lib/jenkins/blog.nvnhan0810.com-zip.zip ./'
+                sh 'zip -r /var/lib/jenkins/blog.nvnhan0810.com-zip.zip .'
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 mv /var/lib/jenkins/blog.nvnhan0810.com-zip.zip /var/www/html/'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 rm -rf /var/lib/jenkins/blog.nvnhan0810.com-zip'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/ && pwd && ls -la && unzip blog.nvnhan0810.com-zip -d blog.nvnhan0810.com-zip'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/ && cp -rTf blog.nvnhan0810.com-zip blog.nvnhan0810.com'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && fnm use'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && npm install'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && npm run build'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "rm -rf /var/www/html/blog.nvnhan0810.com-zip.zip && mv /var/lib/jenkins/blog.nvnhan0810.com-zip.zip /var/www/html/"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "rm -rf /var/lib/jenkins/blog.nvnhan0810.com-zip"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/ && pwd && ls -la && unzip blog.nvnhan0810.com-zip -d blog.nvnhan0810.com-zip"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/ && cp -rTf blog.nvnhan0810.com-zip blog.nvnhan0810.com'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && fnm use && npm install"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && fnm use && npm run build"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf"'
                 }
             }
         }
@@ -21,10 +20,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && pm2 stop blog-nvnhan0810'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && pm2 delete blog-nvnhan0810'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && pm2 --name blog-nvnhan0810 start npm -- start'
-                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 cd /var/www/html/blog.nvnhan0810.com && sudo systemctl reload nginx'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 stop blog-nvnhan0810"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 delete blog-nvnhan0810"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && fnm use && pm2 --name blog-nvnhan0810 start npm -- start"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/blog.nvnhan0810.com && sudo systemctl reload nginx"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 "cd /var/www/html/ && sudo rm -rf blog.nvnhan0810.com-zip*"'
                 }
             }
         }
