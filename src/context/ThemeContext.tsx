@@ -1,9 +1,9 @@
 "use client";
 
-import { FC, ReactNode, createContext, useState } from "react";
+import { FC, ReactNode, createContext, useEffect, useState } from "react";
 import { ThemeContextType } from "./@types/ThemeContext";
 
-export const ThemeContext = createContext<ThemeContextType | null>(null);
+export const ThemeContext = createContext<ThemeContextType>({} as ThemeContextType);
 
 const getFromLocalStorage = () => {
     if (typeof window !== 'undefined') {
@@ -20,7 +20,15 @@ export const ThemeContextProvider: FC<{ children: ReactNode }> = ({ children }) 
         return getFromLocalStorage();
     });
 
+    const toggle = () => {
+        setTheme(theme === 'light' ? 'dark' : 'light');
+    };
+
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+    }, [theme])
+
     return (
-        <ThemeContext.Provider value={{ theme }}>{ children }</ThemeContext.Provider>
+        <ThemeContext.Provider value={{ theme, toggle }}>{ children }</ThemeContext.Provider>
     );
 };
