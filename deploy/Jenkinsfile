@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'zip -r /var/lib/jenkins/blog.nvnhan0810.com-zip.zip .'
+                sshagent (credentials: ['Azdigi-VPS-SSH']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/blog.nvnhan0810.com-zip.zip && mv /var/lib/jenkins/blog.nvnhan0810.com-zip.zip /var/www/html/\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/blog.nvnhan0810.com-zip && mkdir /var/www/html/blog.nvnhan0810.com-zip\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && unzip blog.nvnhan0810.com-zip -d blog.nvnhan0810.com-zip\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && cp -rTf blog.nvnhan0810.com-zip blog.nvnhan0810.com\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && sh deploy/build.sh\"'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sshagent (credentials: ['Azdigi-VPS-SSH']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && fnm use && sh ./deploy/pm2-check.sh\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/blog.nvnhan0810.com && sudo systemctl reload nginx\"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"cd /var/www/html/ && sudo rm -rf blog.nvnhan0810.com-zip*\"'
+                }
+            }
+        }
+    }
+}
