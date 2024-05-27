@@ -4,8 +4,10 @@ cd /var/www/html/blog.nvnhan0810.com || exit
 
 fnm use
 
-npm install
+npm install -g pnpm
 
-npm run build
+pnpm install
+
+pnpm run build
 
 cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf

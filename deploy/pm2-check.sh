@@ -7,4 +7,4 @@ if [ $PM2_EXIST = Yes ] ; then
     pm2 delete blog-nvnhan0810
 fi
 
-pm2 --name blog-nvnhan0810 start npm -- start
+pm2 --name blog-nvnhan0810 start pnpm -- start
