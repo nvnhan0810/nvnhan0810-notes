@@ -19,11 +19,11 @@ export const Icons = {
   ),
   twitter: (props: IconProps) => (
     <svg
-      {...props}
-      height="23"
-      viewBox="0 0 1200 1227"
-      width="23"
       xmlns="http://www.w3.org/2000/svg"
+      height="23"
+      width="23"
+      viewBox="0 0 1200 1227"
+      {...props}
     >
       <path
         fill="currentColor"
