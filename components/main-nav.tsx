@@ -1,10 +1,10 @@
 "use client";
 
 import { siteConfig } from "@/config/site";
-import { Icons } from "./icons";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { Icons } from "./icons";
 
 export function MainNav() {
   const pathname = usePathname();
@@ -24,11 +24,8 @@ export function MainNav() {
         Blog
       </Link>
       <Link
-        href="/about"
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
-          pathname === "/about" ? "text-foreground" : "text-foreground/60"
-        )}
+        href={siteConfig.links.author}
+        className="text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block text-foreground/60"
       >
         About
       </Link>

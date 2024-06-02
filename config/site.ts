@@ -4,6 +4,7 @@ export const siteConfig = {
   description: "My Simple Blog Website",
   author: "NVNhan",
   links: {
+    author: "https://nvnnhan0810.com",
     twitter: "",
     github: "",
     personalSite: "",
