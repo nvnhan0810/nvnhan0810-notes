@@ -11,8 +11,30 @@ published: true
 
 Open file `~/.Xresources` and add this line
 
-```
+```bash
 Xft.dpi: 125
 ```
 
 Save file and run command and reboot 
+
+## Install Bluetooth Manager
+
+Run these command
+
+```bash
+sudo systemctl start bluetooth
+sudo systemctl enable bluetooth
+sudo pacman -S --needed bluez bluez-utils
+sudo pacman -S blueman
+```
+
+**Fix audio not export bluetooth device**
+
+Create file at `/etc/pulse/default.pa` and enter content: 
+
+```bash
+### Automatically switch to newly-connected devices
+load-module module-switch-on-connect
+```
+
+Restart device
