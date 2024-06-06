@@ -88,10 +88,10 @@ ibus-daemon -rxd
 
 ```bash
 git clone git@github.com:nguyenvannhan/dotfile.git
+pacman -S eza
 ```
 
 ### Install Nerd Fonts
-
 
 ```bash
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
@@ -126,4 +126,32 @@ source ~/.zshrc
 ```bash
 curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "./.fnm" --skip-shell
 fnm install --lts
+```
+
+## Config tmux
+
+```bash
+sudo pacman -S tmux
+ln -s /home/nvnhan/dotfiles/configs/tmux /home/nvnhan/.config/tmux
+sudo rm -r ~/.config/tmux/plugins
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+```
+Use `Ctrl + Shift + I` to install extension for tmux
+Use `Ctrl +b` and `r` to reload config tmux
+
+## Config LazyVim
+
+```bash
+sudo pacman -S neovim
+ln -s /home/nvnhan/dotfile/configs/nvim /home/nvnhan/.config/nvim
+```
+
+## Install Visual Studio Code
+```bash
+cd /opt
+sudo git clone https://aur.archlinux.org/yay-git.git
+sudo chown nvnhan:nvnhan yay-git
+cd yay-git
+makepkg -si
+yay -S visual-studio-code-bin
 ```
