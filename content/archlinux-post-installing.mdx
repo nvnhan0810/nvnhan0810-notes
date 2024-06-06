@@ -1,0 +1,80 @@
+---
+title: Arch Linux - The things must do after installing  
+description: This is the things must do after installing Arch Linux on macbook 2015 Pro
+date: 2024-06-06
+tags: ["linux", "arch linux"]
+published: true
+---
+
+
+## Edit Scaling
+
+Create file `~/.Xresources` and add this line
+
+```bash
+Xft.dpi: 192
+```
+
+Open file `~/.xinitrc` and add:
+
+```bash
+xrdb -merge ~/.Xresources
+```
+
+
+Save file and run command and press: `Win + Shift + r` 
+
+## Config i3
+
+Add these configs to `~/.config/i3/config`
+
+```bash
+bar {
+    status_command i3status
+    position top
+}
+
+for_window [class="^.*"] border none
+
+gaps inner 10px
+```
+
+## Install microcode update
+
+```bash
+sudo pacman -S intel-ucode
+```
+
+## Install Bluetooth
+
+Run these command
+
+```bash
+sudo pacman -S --needed bluez bluez-utils
+sudo modprobe btusb
+sudo systemctl start bluetooth
+sudo systemctl enable bluetooth
+sudo pacman -S blueman
+```
+
+## Install Ibus-bamboo
+
+```bash
+sudo pacman -S ibus
+
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/BambooEngine/ibus-bamboo/master/archlinux/install.sh)"
+```
+
+Add thess lines to `/etc/environment`
+
+```bash
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
+```
+
+Add this line to `~/.xprofile`
+
+```bash
+ibus-daemon -rxd
+```
