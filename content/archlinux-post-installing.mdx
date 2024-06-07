@@ -62,6 +62,19 @@ sudo systemctl enable bluetooth
 sudo pacman -S blueman
 ```
 
+Setup Bluetooth Audio
+
+```bash
+sudo pacman -S pipewire pipewire-pulse pipewire-alsa pipewire-audio
+```
+
+Create file /`etc/modprobe.d/50-alsa.conf` with content:
+
+```bash 
+# set nivida card as secondary sound output for alsa 
+options snd-hda-intel index=1,0
+```
+
 ## Install Ibus-bamboo
 
 ```bash

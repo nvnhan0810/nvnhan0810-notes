@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
-import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
+import { ImageResponse } from "next/og";
+import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
@@ -26,20 +26,7 @@ export async function GET(req: NextRequest) {
       (
         <div tw="flex relative flex-col p-12 w-full h-full items-start text-black bg-white">
           <div tw="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M4 11a9 9 0 0 1 9 9" />
-              <path d="M4 4a16 16 0 0 1 16 16" />
-              <circle cx="5" cy="19" r="1" />
-            </svg>
-            <p tw="ml-2 font-bold text-2xl">JollyBlog</p>
+            <p tw="ml-2 font-bold text-2xl">Blog</p>
           </div>
           <div tw="flex flex-col flex-1 py-10">
             <div tw="flex text-xl uppercase font-bold tracking-tight font-normal">

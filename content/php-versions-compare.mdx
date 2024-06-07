@@ -1,0 +1,145 @@
+---
+title: PHP Release Changes
+description: Summary PHP new changes of each version
+date: 2024-06-06
+tags: ["linux", "arch linux"]
+published: true
+---
+
+## PHP 7.x
+
+### Compiler
+
+- The performance of PHP7 doubled compared to PHP5.6
+
+### Syntax
+
+#### Khai báo kiểu dữ liệu cho biến và kiểu dữ liệu trả về.
+
+- Các kiểu dữ liệu được hỗ trợ gồm: class/interface name, self, parent,  array, int, float, bool, string, callable, iterable (7.1), object (7.2) và mixed (8.0)
+
+    https://www.php.net/manual/en/language.types.declarations.php#language.types.declarations.composite.union
+
+#### Class ẩn danh (anonymous class)
+
+- Hỗ trợ cho các lớp ẩn danh đã được thêm vào thông qua lớp mới. Chúng có thể được sử dụng thay cho các định nghĩa lớp đầy đủ cho các đối tượng vứt bỏ:
+
+    https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.anonymous-classes
+
+#### Khai báo hằng số kiểu mảng với define.
+
+- Với php5.6 chỉ có thể khai báo hằng số giá tị mảng với const.
+
+#### Nhóm câu lệnh import với use.
+
+- Giờ đây, các lớp, hàm và hằng được nhập từ cùng một không gian tên có thể được nhóm lại với nhau trong một câu lệnh sử dụng duy nhất.
+    https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.group-use-declarations
+
+#### Arrow function
+
+- Cú pháp function ngắn gọn để khai báo
+
+#### Dấu phân tách chữ số.
+
+- Dấu _ (underscore) để chia chữ số cho dễ nhìn. 
+
+### Toán Tử
+
+#### Toán tử null (??)
+
+- Nó là giản lược của toán tử 3 ngôi với kiếm tra isset.
+- Trả về toán hàng đầu nếu nó được khởi tạo và khác null, ngược lại trả về toán hạng 2.
+    https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.null-coalesce-op
+
+#### Toán tử spaceship. (<==>)
+- So sánh hai toán hạng. 
+
+    Trả về -1 khi $a < $b
+
+    Trả về 0 khi $a == $b
+        
+    Trả về 1 khi $a > $b
+
+    https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
+
+## PHP 8.x
+
+### Trình biên dịch JIT
+
+- PHP 8 giới thiệu 2 công cụ biên dịch JIT mới. Cho thấy hiệu suất tăng 3 lần với synthetic benmarks và 1.5 tới 2 lần với long-run application benchmarks
+
+### Syntax 
+
+#### Đặt tên tham số. 
+
+- Các đối số (argument) của một hàm (function, method) nay có thể được pass với tên của tham số đó. 
+- Không quan tâm thứ tự trước sau. 
+- Chỉ yêu cầu với các đối số bắt buộc, có thể bỏ qua các đối số tuỳ chọn
+    https://wiki.php.net/rfc/named_params
+
+#### Thuộc tính metadata (Attributes)
+
+- PHP nay hỗ trợ native cú pháp để viết các thông tin metadata cho class, methods, functions, attribute,... như các lib, package như PHPDoc
+- Các thông tin metadata nay có thể được inspect lúc runtime bởi Reflection API
+    https://www.php.net/manual/en/language.attributes.overview.php
+
+- Khai báo biến hàm khởi tạo (Constructor property promotion)
+- Tiết kiệm viết mã hơn để xác định và khởi tạo thuộc tính.
+    https://www.php.net/releases/8.0/en.php#constructor-property-promotion
+
+#### Hợp nhất các kiểu (Union types)
+
+- Thay vì các chú thích PHPDoc cho sự kết hợp của các kiểu, bạn có thể sử dụng các khai báo kiểu liên minh gốc được xác thực trong thời gian chạy.
+    https://www.php.net/releases/8.0/en.php#union-types
+
+#### Vấn đề so sánh chuỗi và số.
+
+- Trước đây, với các so sánh không ràng buộc giữa chuỗi và số. PHP thường cố gắng cast chuỗi về số để so sánh và thường tạo ra các so sánh không đúng như: 0 == 'string' sẽ trả về true
+- Từ PHP 8, Khi chuỗi được cast thành string không thành công, trình biên dịch sẽ cast số thành chuỗi numeric để so sánh.
+
+#### Toán tử Enums
+
+- Sử dụng toán tử enums thay vì bộ các hằng số và ràng buộc giá trị khi sử dụng.
+    https://www.php.net/releases/8.1/en.php#enumerations
+
+#### Thuộc tính chỉ đọc (Readonly Properties)
+
+- Thuộc tính chỉ đọc là thuộc tính không thể thay đổi giá trị sau khi đã khởi tạo.
+    https://www.php.net/releases/8.1/en.php#readonly_properties
+
+#### Điếm mới trong khởi tạo giá trị.
+
+- Từ nay có thể gán giá trị mặc định là object
+    https://www.php.net/releases/8.1/en.php#new_in_initializers
+
+#### Hỗ trợ hằng số final
+
+- PHP 8.1 hỗ trợ khai báo hằng số final, hằng số không thể bị override bởi class con
+    https://www.php.net/releases/8.1/en.php#final_class_constants
+
+#### Unpacking mảng hỗ trợ key kiểu chuỗi
+
+- Trước PHP8.1 chỉ hỗ trợ unpacking mãng với toán tử spread (...) với mảng có key là số. Từ 8.1 support key kiểu chuỗi.
+    https://www.php.net/releases/8.1/en.php#array_unpacking_support_for_string_keyed_arrays
+
+### Toán tử
+
+#### Toán tử match
+
+- Giống switch nhưng so sánh strict type (===)
+    https://www.php.net/releases/8.0/en.php#match-expression
+
+#### Toán tử Nullsafe
+
+- Thay vì điều kiện kiểm tra null, bây giờ bạn có thể sử dụng một chuỗi các cuộc gọi với toán tử nullsafe mới.
+- Khi đánh giá một phần tử trong chuỗi fails, quá trình thực thi của toàn bộ chuỗi sẽ bị hủy bỏ và toàn bộ chuỗi được gán là null.
+    https://www.php.net/releases/8.0/en.php#nullsafe-operator
+
+
+### Exception - Error
+
+#### Thống nhất lỗi Exception
+
+- Thống nhất lại lỗi các internal function. Từ php8 trở đi, hầu hết các lỗi hàm đều ném error exception thay vì warning
+    https://www.php.net/releases/8.0/en.php#consistent-type-errors-for-internal-functions
+
