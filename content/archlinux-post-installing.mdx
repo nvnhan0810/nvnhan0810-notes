@@ -155,3 +155,17 @@ cd yay-git
 makepkg -si
 yay -S visual-studio-code-bin
 ```
+
+## Setup Theme
+```bash
+sudo pacman -S lxappearance-gtk3 arc-gtk-theme dracula-icons-theme
+yay -S dracula-icons-theme
+```
+
+Open `lxappearance` and setting theme and icon
+
+Open file `~/.config/gtk-3.0/settings.ini and add lines
+```bash
+gtk-application-prefer-dark-theme=1
+```
+
