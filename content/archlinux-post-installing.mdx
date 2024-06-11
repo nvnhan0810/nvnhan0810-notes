@@ -13,17 +13,9 @@ sudo pacman -S alacritty
 ```
 
 ## Edit Scaling
-
-Create file `~/.Xresources` and add this line
-
 ```bash
-Xft.dpi: 192
-```
-
-Open file `~/.xinitrc` and add:
-
-```bash
-xrdb -merge ~/.Xresources
+ln -s /home/nvnhan/dotfile/config/arch-linux/.Xresources /home/nvnhan/.Xresources
+ln -s /home/nvnhan/dotfile/config/arch-linux/.xinitrc /home/nvnhan/.xinitrc
 ```
 
 
@@ -31,23 +23,8 @@ Save file and run command and press: `Win + Shift + r`
 
 ## Config i3
 
-Add these configs to `~/.config/i3/config`
-
 ```bash
-bar {
-    status_command i3status
-    position top
-}
-
-for_window [class="^.*"] border none
-
-gaps inner 10px
-```
-
-## Install microcode update
-
-```bash
-sudo pacman -S intel-ucode
+ln -s /home/nvnhan/dotfile/configs/arch-linux/i3 /home/nvnhan/.config
 ```
 
 ## Install Bluetooth
@@ -66,13 +43,6 @@ Setup Bluetooth Audio
 
 ```bash
 sudo pacman -S pipewire pipewire-pulse pipewire-alsa pipewire-audio
-```
-
-Create file /`etc/modprobe.d/50-alsa.conf` with content:
-
-```bash 
-# set nivida card as secondary sound output for alsa 
-options snd-hda-intel index=1,0
 ```
 
 ## Install Ibus-bamboo
@@ -120,7 +90,12 @@ sudo fc-cache -v
 ```bash
 sudo pacman -S rofi
 
-ln -s /home/nvnhan/dotfile/configs/rofi /home/nvnhan/.config
+git clone git@github.com:adi1090x/rofi.git
+sudo mkdir /usr/share/fonts/rofi
+sudo cp rofi/fonts/* /usr/share/fonts/rofi
+sudo fc-cache -v
+
+ln -s /home/nvnhan/dotfile/configs/arch-linux/rofi /home/nvnhan/.config
 ```
 
 ## Update config Alacritty
@@ -188,7 +163,7 @@ yay -S visual-studio-code-bin
 
 ## Setup Theme
 ```bash
-sudo pacman -S lxappearance-gtk3 arc-gtk-theme dracula-icons-theme
+sudo pacman -S lxappearance-gtk3
 yay -S dracula-gtk-theme
 git clone https://github.com/m4thewz/dracula-icons ~/.icons/dracula-icons
 ```
@@ -204,7 +179,7 @@ gtk-application-prefer-dark-theme=1
 
 ```bash
 sudo pacman -S dunst
-ln -s /home/nvnhan/dotfile/configs/dunst /home/nvnhan/.config
+ln -s /home/nvnhan/dotfile/configs/arch-linux/dunst /home/nvnhan/.config
 ```
 
 ## Setup background
