@@ -104,7 +104,7 @@ git clone git@github.com:nguyenvannhan/dotfile.git
 pacman -S eza
 ```
 
-### Install Nerd Fonts
+## Install Nerd Fonts
 
 ```bash
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
@@ -113,6 +113,14 @@ sudo pacman -S unzip
 unzip JetBrainsMono.zip -d jetbrains-mono-nerd-fonts/
 sudo mv jetbrains-mono-nerd-fonts/ /usr/share/fonts/
 sudo fc-cache -v
+```
+
+## Install Rofi
+
+```bash
+sudo pacman -S rofi
+
+ln -s /home/nvnhan/dotfile/configs/rofi /home/nvnhan/.config
 ```
 
 ## Update config Alacritty
@@ -127,11 +135,20 @@ ln -s /home/nvnhan/dotfile/configs/alacritty/ /home/nvnhan/.config/
 # Install ZSH
 sudo pacman -S zsh
 sudo chsh -s $(which zsh)
+
+# Install extentions
 ln -s /home/nvnhan/dotfile/configs/.zshrc /home/nvnhan/.zshrc
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+# Install dracula theme
 source ~/.zshrc
+git clone https://github.com/dracula/zsh.git
+cd zsh 
+mv dracula.zsh-theme ~/.oh-my-zsh/themes/ 
+mkdir ~/.oh-my-zsh/themes/lib/
+mv lib/async.zsh ~/.oh-my-zsh/themes/lib/
 ```
 
 ## Config fnm
@@ -203,3 +220,4 @@ Desktop wallpaper setup in i3 config
 ```bash
 sudo pacman -S noto-fonts-cjk noto-fonts-emoji noto-fonts
 ```
+
