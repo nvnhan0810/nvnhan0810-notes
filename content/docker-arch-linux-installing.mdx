@@ -1,0 +1,33 @@
+---
+title: Install Docker on Arch Linux  
+description: Install Docker on Arch Linux
+date: 2024-06-12
+tags: ["docker", "arch linux"]
+published: true
+---
+
+- Install docker and docker-compose 
+
+```base 
+sudo pacman -S docker docker-compose
+```
+
+- Start docker service 
+
+```bash 
+sudo systemctl start docker.service 
+sudo systemctl enable docker.service
+```
+
+- Rootless docker 
+
+```bash 
+sudo usermod -aG docker $USER
+newgrp docker
+````
+
+- Verify
+
+```bash 
+docker run hello-world
+```
