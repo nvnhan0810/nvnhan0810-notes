@@ -1,6 +1,7 @@
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
+import rehypeExternalLinks from "rehype-external-links";
 import { defineCollection, defineConfig, s } from "velite";
 
 const posts = defineCollection({
@@ -41,6 +42,9 @@ export default defineConfig({
             ariaLabel: "Link to section",
           },
         },
+      ],
+      [
+        rehypeExternalLinks, { rel: ['nofollow'], target: '_blank', },
       ],
     ],
     remarkPlugins: [],
