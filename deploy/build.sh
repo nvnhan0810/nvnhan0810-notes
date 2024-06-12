@@ -1,6 +1,6 @@
 #! /bin/sh
 
-cd /var/www/html/blog.nvnhan0810.com || exit
+cd /var/www/html/notes.nvnhan0810.com || exit
 
 fnm use
 
@@ -10,4 +10,5 @@ pnpm install
 
 pnpm run build
 
-cp /var/www/html/blog.nvnhan0810.com/deploy/nginx/blog.nvnhan0810.com.conf /etc/nginx/conf.d/blog.nvnhan0810.com.conf
+cp /var/www/html/notes.nvnhan0810.com/deploy/nginx/notes.nvnhan0810.com.conf /etc/nginx/conf.d/notes.nvnhan0810.com.conf
+
