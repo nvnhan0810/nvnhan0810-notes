@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Blog",
+  name: "Notes",
   url: "https://notes.nvnhan0810.com",
   description: "The site which I note the interest something to save... ::))",
   author: "Nguyen Van Nhan",
