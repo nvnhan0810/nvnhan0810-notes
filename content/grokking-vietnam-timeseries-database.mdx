@@ -1,0 +1,53 @@
+
+---
+title: Grokking Vietnam - My note about Timeseries Database Techtalk
+description: This is summary info about Timeseries Database I watch on youtube from Grooking Vietnam Channel. 
+date: 2024-06-12
+tags: ["database", "timeseries-database", "grokking-vietnam"]
+published: true
+---
+
+- [Origin Article](https://www.youtube.com/watch?v=2vC1hGaDLtc&list=PLTosua2FQlwbXqonR58fiV3Z0Tr-m3rjU)
+- [Slide](https://docs.google.com/presentation/d/1xg_pt6GFTa77eq5NepKHarRLUrN8Jvg2zBEkQMYFVO0/edit?pli=1#slide=id.p)
+- [Paper Document](https://www.vldb.org/pvldb/vol8/p1816-teller.pdf)
+
+## Timeseries database là gì?
+
+- Là datbase chứa các data point.
+  - Database point = (Timestamp, value)
+  - Timestamp: int32_t
+  - value: double 
+- Các database timeseries khác hiện giờ có thể lưu value khác double như string
+- Requirement:
+  - Đọc rất nhanh.
+  - Available rất cao. Thường dùng để monitor hệ thống nên tính available phải cao.
+  - OK khi mất một ít data nhỏ.
+  - Tỉ lệ write trên read rất cao.
+  - Data trong 1 ngày được lưu in-memory.
+
+## Interface 
+
+- Get(key, time_range) -> list&lt;timstamp, value&gt;
+  -> MultiGet
+- Put(key, timestamp, value)
+
+
+## Implementation 
+
+Ví dụ về Facebook Gorilla
+
+- Sharding 
+  - hash(key) % number of shard 
+- ShardMap 
+  - List of shards for this node 
+  - Shard_id -> TSMap 
+- TSMap 
+  - List of timeseries for a shard 
+  - Key -> shared_ptr&lt;TS&gt;
+- TS 
+  - 1 open block 
+  - 12 closed blocks 
+  - Each block is 2 hour 
+
+
+
