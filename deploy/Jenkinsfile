@@ -14,9 +14,9 @@ pipeline {
                 sh 'sed -i "s/GOOGLE_CLIENT_ID=example/GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID_CRED/g" .env'
                 sh 'sed -i "s/GOOGLE_CLIENT_SECRET=example/GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET_CRED/g" .env'
                 sh 'sed -i "s/AUTH_SECRET=example/AUTH_SECRET=$AUTH_SECRET_CRED/g" .env'
-                sh 'sed -i "s/DATABASE_URL=example/DATABASE_URL=$DATABASE_URL_CRED/g" .env'
+                sh 'sed -i "s|DATABASE_URL=example|DATABASE_URL=$DATABASE_URL_CRED|g" .env'
                 sh 'zip -r /var/lib/jenkins/notes.nvnhan0810.com-zip.zip .'
-                
+
                 sshagent (credentials: ['Azdigi-VPS-SSH']) {
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/notes.nvnhan0810.com-zip.zip && mv /var/lib/jenkins/notes.nvnhan0810.com-zip.zip /var/www/html/\"'
                     sh 'ssh -o StrictHostKeyChecking=no root@116.118.49.239 \"rm -rf /var/www/html/notes.nvnhan0810.com-zip && mkdir /var/www/html/notes.nvnhan0810.com-zip\"'
