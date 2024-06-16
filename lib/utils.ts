@@ -24,9 +24,9 @@ export function sortPosts(posts: Array<Post>) {
   });
 }
 
-export function getAllTags(posts: Array<Post>) {
+export function getAllTags(posts: Array<Post>, isAdmin: boolean = false) {
   const tags: Record<string, number> = {}
-  posts.forEach(post => {
+  posts.filter((item) => isAdmin || item.published).forEach(post => {
     post.tags?.forEach(tag => {
       tags[tag] = (tags[tag] ?? 0) + 1;
     })
@@ -39,9 +39,9 @@ export function sortTagsByCount(tags: Record<string, number>) {
   return Object.keys(tags).sort((a, b) => tags[b] - tags[a])
 }
 
-export function getPostsByTagSlug(posts: Array<Post>, tag: string) {
+export function getPostsByTagSlug(posts: Array<Post>, tag: string, isAdmin: boolean) {
   return posts.filter(post => {
-    if (!post.tags) return false
+    if (!post.tags || (!isAdmin && !post.published)) return false
     const slugifiedTags = post.tags.map(tag => slug(tag))
     return slugifiedTags.includes(tag)
   })

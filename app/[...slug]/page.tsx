@@ -17,7 +17,14 @@ async function getPostFromParams(params: PostPageProps["params"]) {
   const slug = params?.slug?.join("/");
   const post = posts.find((post) => post.slug === slug);
 
-  return post ? (await isAdmin() && post.published ? post : null) : null;
+  if (await isAdmin() && post) {
+    return {
+      ...post,
+      published: true,
+    };
+  }
+
+  return post;
 }
 
 export async function generateMetadata({
@@ -68,7 +75,7 @@ export async function generateStaticParams(): Promise<
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
 
-  if (!post || !post.published) {
+  if (!post || (!(await isAdmin()) && !post?.published)) {
     notFound();
   }
 

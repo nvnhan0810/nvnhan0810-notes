@@ -22,7 +22,8 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = Number(searchParams?.page) || 1;
-  const sortedPosts = await isAdmin() ? sortPosts(posts) : sortPosts(posts.filter((post) => post.published));
+  const checkAdmin = await isAdmin();
+  const sortedPosts = checkAdmin ? sortPosts(posts) : sortPosts(posts.filter((post) => post.published));
   const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
 
   const displayPosts = sortedPosts.slice(
@@ -30,7 +31,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     POSTS_PER_PAGE * currentPage
   );
 
-  const tags = getAllTags(posts);
+  const tags = getAllTags(posts, checkAdmin);
   const sortedTags = sortTagsByCount(tags);
 
   return (

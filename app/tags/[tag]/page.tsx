@@ -2,6 +2,7 @@ import { posts } from "#site/content";
 import { PostItem } from "@/components/post-item";
 import { Tag } from "@/components/tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isAdmin } from "@/lib/auth";
 import { getAllTags, getPostsByTagSlug, sortTagsByCount } from "@/lib/utils";
 import { slug } from "github-slugger";
 import { Metadata } from "next";
@@ -22,18 +23,19 @@ export async function generateMetadata({
   };
 }
 
-export const generateStaticParams = () => {
+export const generateStaticParams = async () => {
   const tags = getAllTags(posts);
   const paths = Object.keys(tags).map((tag) => ({ tag: slug(tag) }));
   return paths;
 };
 
-export default function TagPage({ params }: TagPageProps) {
+export default async function TagPage({ params }: TagPageProps) {
   const { tag } = params;
   const title = tag.split("-").join(" ");
+  const checkAdmin = await isAdmin();
 
-  const displayPosts = getPostsByTagSlug(posts, tag);
-  const tags = getAllTags(posts);
+  const displayPosts = getPostsByTagSlug(posts, tag, checkAdmin);
+  const tags = getAllTags(posts, checkAdmin);
   const sortedTags = sortTagsByCount(tags);
 
   return (
