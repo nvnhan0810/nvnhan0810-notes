@@ -1,6 +1,6 @@
 import { Providers } from "@/components/providers";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import SiteHeader from "@/components/site-header";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
@@ -22,11 +22,11 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+const RootLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html lang="en" className="scroll-pt-[3.5rem]">
       <body
@@ -45,4 +45,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

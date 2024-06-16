@@ -3,6 +3,7 @@ import { PostItem } from "@/components/post-item";
 import { QueryPagination } from "@/components/query-pagination";
 import { Tag } from "@/components/tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isAdmin } from "@/lib/auth";
 import { getAllTags, sortPosts, sortTagsByCount } from "@/lib/utils";
 import { Metadata } from "next";
 
@@ -21,7 +22,7 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = Number(searchParams?.page) || 1;
-  const sortedPosts = sortPosts(posts.filter((post) => post.published));
+  const sortedPosts = await isAdmin() ? sortPosts(posts) : sortPosts(posts.filter((post) => post.published));
   const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
 
   const displayPosts = sortedPosts.slice(
@@ -45,7 +46,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           {displayPosts?.length > 0 ? (
             <ul className="flex flex-col">
               {displayPosts.map((post) => {
-                const { slug, date, title, description, tags } = post;
+                const { slug, date, title, description, tags, published } = post;
                 return (
                   <li key={slug}>
                     <PostItem
@@ -54,6 +55,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       title={title}
                       description={description}
                       tags={tags}
+                      isPublished={published}
                     />
                   </li>
                 );

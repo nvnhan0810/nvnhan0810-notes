@@ -1,8 +1,8 @@
+import { cn, formatDate } from "@/lib/utils";
 import { Calendar } from "lucide-react";
 import Link from "next/link";
-import { buttonVariants } from "./ui/button";
-import { cn, formatDate } from "@/lib/utils";
 import { Tag } from "./tag";
+import { buttonVariants } from "./ui/button";
 
 interface PostItemProps {
   slug: string;
@@ -10,6 +10,7 @@ interface PostItemProps {
   description?: string;
   date: string;
   tags?: Array<string>;
+  isPublished?: boolean;
 }
 
 export function PostItem({
@@ -18,6 +19,7 @@ export function PostItem({
   description,
   date,
   tags,
+  isPublished,
 }: PostItemProps) {
   return (
     <article className="flex flex-col gap-2 border-border border-b py-3">
@@ -37,7 +39,11 @@ export function PostItem({
           <dt className="sr-only">Published On</dt>
           <dd className="text-sm sm:text-base font-medium flex items-center gap-1">
             <Calendar className="h-4 w-4" />
-            <time dateTime={date}>{formatDate(date)}</time>
+            {isPublished ? (
+              <time dateTime={date}>{formatDate(date)}</time>
+            ) : (
+              <span className="text-red-700 dark:text-red-500">Not Published</span>
+            )}
           </dd>
         </dl>
         <Link

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Tag } from "@/components/tag";
 import { siteConfig } from "@/config/site";
+import { isAdmin } from "@/lib/auth";
 import "@/styles/mdx.css";
 import { Metadata } from "next";
 interface PostPageProps {
@@ -14,10 +15,9 @@ interface PostPageProps {
 
 async function getPostFromParams(params: PostPageProps["params"]) {
   const slug = params?.slug?.join("/");
-  console.log(slug, posts);
   const post = posts.find((post) => post.slug === slug);
 
-  return post;
+  return post ? (await isAdmin() && post.published ? post : null) : null;
 }
 
 export async function generateMetadata({
@@ -25,7 +25,7 @@ export async function generateMetadata({
 }: PostPageProps): Promise<Metadata> {
   const post = await getPostFromParams(params);
 
-  if (!post) {
+  if (!post || (await isAdmin() && !post.published)) {
     return {};
   }
 
