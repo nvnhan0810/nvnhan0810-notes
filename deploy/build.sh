@@ -8,9 +8,11 @@ npm install -g pnpm
 
 pnpm install
 
-pnpm run build
-
 pnpm exec prisma migrate deploy
+
+pnpm exec prisma db push
+
+pnpm run build
 
 cp /var/www/html/notes.nvnhan0810.com/deploy/nginx/notes.nvnhan0810.com.conf /etc/nginx/conf.d/notes.nvnhan0810.com.conf
 
