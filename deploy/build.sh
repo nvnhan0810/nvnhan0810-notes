@@ -8,7 +8,9 @@ npm install -g pnpm
 
 pnpm install
 
-pnpm exec prisma migrate pull
+pnpm exec prisma migrate generate
+
+pnpm exec prisma migrate deploy
 
 pnpm run build
 
