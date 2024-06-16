@@ -10,7 +10,7 @@ pnpm install
 
 pnpm exec prisma migrate generate
 
-pnpm exec prisma migrate deploy
+# pnpm exec prisma migrate deploy
 
 pnpm run build
 
