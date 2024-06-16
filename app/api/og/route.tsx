@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
           </div>
           <div tw="flex flex-col flex-1 py-10">
             <div tw="flex text-xl uppercase font-bold tracking-tight font-normal">
-              BLOG POST
+              NOTE POST
             </div>
             <div tw="flex text-[80px] font-bold text-[50px]">{heading}</div>
           </div>
