@@ -1,0 +1,101 @@
+---
+title: Tổng quan về MongoDB  
+description: Tổng hợp kiến thức về MongoDB
+date: 2024-06-06
+tags: ["mongodb", "database"]
+published: true
+---
+
+## Các thành phần ánh xạ giữa MongoDB và RDBMS 
+
+![RDMS-MongoDB](https://beginnersbook.com/wp-content/uploads/2017/09/RDBMS_MongoDB_Mapping.jpg)
+
+## Mô hình triển khai MongoDB 
+
+### Standalone
+
+- 1 máy chủ triển khai **read** và **write** database
+
+
+### Replication
+
+- Nhiều server, mỗi server đều cài MongoDB. 
+- Có 1 **master** để cập nhật, sửa đổi database
+- Khi có thay đổi từ **master** => cập nhật dữ liệu sang các **slave**
+
+![Replication](https://www.researchgate.net/publication/341951020/figure/fig3/AS:940967003705344@1601355424060/Replica-Set-architecture-in-MongoDB.png)
+
+### Sharding
+
+- Dữ liệu chẻ đều để ở nhiều server.
+- Trong mỗi shard vẫn có thể config replication để đảm bảo tính sẵn sàng.
+- Có thể scale chiều ngang bằng việc thêm Shard (server máy chủ mới)
+
+![Sharding](https://webimages.mongodb.com/_com_assets/cms/kyc0jb18ofictfyzk-image3.png?auto=format%252Ccompress)
+
+
+## Triển khai MongoDB
+
+- MongoDB Atlas: Sử dụng như dịch vụ cloud
+- MongoDB On-Premise: Cài đặt trên chính server.
+
+## Kiến trúc hoạt động MongoDB (Storage Engine)
+
+- Mỗi storage engine có giải thuật xử lí riêng, có ưu nhược điểm riêng
+- Chịu trách nhiệm xử lí dữ liệu và lưu dữ liệu trên memory và trên các file vật lý (phía OS)
+- Một số loại Storage Engine trong MongoDB:
+    - **MMAP v1** 
+    - **WiredTiger Storage Engine**: Default từ phiên bản 3.2.  
+    - **In-memory Storage Engine**: Chỉ sử dụng với phiên bản Enterprise
+
+Câu lệnh kiểm tra Storage Engine đang được sử dụng:
+
+```bash
+db.serverStatus().storageEngine
+```
+
+### WiredTiger Architech Structure
+
+![WiredTiger](http://nicewoong.github.io/assets/wiredtiger_internal.jpg)
+
+## Làm việc với dữ liệu trong MongoDB 
+
+- Tạo mới dữ liệu: `insertOne`, `insertMany`
+- Xem toàn bộ dữ liệu: `db.name_collection.find()`
+- Giới hạn số bản ghi trả về: `db.name_collection.find().limit(number)`
+- Filter theo điều kiện: `db.name_collection.find(condition query)`
+- Sắp xếp kết quả với: `sort`
+- Chỉnh sửa dữ liệu: `updateOne`, `updateMany`
+- Xóa dữ liệu: `deleteOne`, `deleteMany`
+- Drop collection: `drop`
+
+> Change `name_collection` to your collection name
+
+## Tối ưu MongoDB
+
+#### Kiểm tra thông tin dữ liệu 
+
+- Kiểm tra thông tin collection: 
+
+```bash 
+    - Index trên 1 trường: 
+show collections
+```
+
+- Kiểm tra index trên collection: 
+
+```bash
+db.name_collection.getIndexes() 
+```
+
+- Kiểm tra thông số của collection:
+
+```bash
+db.runCommand({ colStats: "customers" }) 
+```
+
+- Xem chiến lược thực thi của câu lệnh với lệnh: `.explain("executionStats")`
+
+- Tối ưu sử dụng **Index**: 
+    - Tạo index với lệnh `.createIndex`
+    - Xóa index với lệnh: `.dropIndex`
