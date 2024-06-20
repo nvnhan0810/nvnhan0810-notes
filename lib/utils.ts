@@ -40,7 +40,7 @@ export function sortTagsByCount(tags: Record<string, number>) {
 }
 
 export function getPostsByTagSlug(posts: Array<Post>, tag: string, isAdmin: boolean) {
-  return posts.filter(post => {
+  return sortPosts(posts).filter(post => {
     if (!post.tags || (!isAdmin && !post.published)) return false
     const slugifiedTags = post.tags.map(tag => slug(tag))
     return slugifiedTags.includes(tag)
