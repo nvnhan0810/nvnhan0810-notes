@@ -3,7 +3,7 @@ title: Hiểu hơn về PHP - Laravel Session
 description: Cơ chế xử lí Session của PHP - Laravel
 date: 2024-06-20
 tags: ["laravel", "session", "php"]
-published: false
+published: true
 ---
 
 Bài viết được dịch và dựa vào bài [Laravel sessions vs PHP session](https://iwasherefirst2.medium.com/how-do-laravel-sessions-work-7b65d74a79a6)
@@ -107,4 +107,4 @@ Khi user login với option `remember me`, user sẽ được login mãi đến 
 
 Cơ chế là 1 token sẽ được và lưu trong db lẫn cookie (cần hashed khi lưu cookie).
 
-Khi user mở browser và session login hết hạn. Token sẽ được compare giữa cookie và DB. Nếu token 
+Khi user mở browser và session login hết hạn. Token sẽ được compare giữa cookie và DB. Nếu token trong DB và cookie giống nhau, session login mới sẽ được tạo.
