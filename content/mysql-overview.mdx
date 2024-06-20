@@ -1,0 +1,191 @@
+---
+title: Tổng quan kiến trúc về MySQL  
+description: Tổng hợp kiến trúc về MySQL
+date: 2024-06-20
+tags: ["mysql", "database"]
+published: true
+---
+
+## Kiến trúc InnoDB của MySQL
+
+### Các thư mục sau khi cài đặt 
+
+**Sys directory**: Chứa thông tin liên quan tới sys schema. Chứa các objects liên quan đến Performance Schema
+
+**performance_schema directory**: Lưu thông tin để kiểm tra hoạt dộng MySQL lúc đang hoạt động.
+ 
+**mysql directory**: Đây là các thông tin yêu cầu bởi MySQL khi hoạt động
+
+### Kiến trúc trên memory
+
+Có 2 thành phần:
+
+- **buffer pool**: cache các dữ liệu thường xuyên sử dụng
+    - Table 
+    - Index
+- **Change buffer**: Thay đổi dữ liệu diễn ra trên Change Buffer nếu Table chưa kịp load vào Buffer Pool, việc đồng bộ sẽ diễn ra sau.
+- **Adaptive Hash Index**: Giúp tăng tốc tìm kiếm.
+- **Log Buffer**: Ghi lại các thay đổi dữ liệu khi hệ thống thức hiện các câu lệnh DML
+
+### Kiến trúc ở Disk
+
+#### Tablesapce 
+
+Tablespace là không gian để lưu các table có cùng tính chất, kiểu dữ liệu.
+
+Chia thành nhiều tablespace. 
+- **System Tablespace**
+    - Trước bản 8.0.20: Lưu doublewrite và datadictionary. Các phiên bản sau thì tách riêng.
+    - Mặc định là file `ibdataa1`
+    - Là vùng lưu dữ liệu Change Buffer
+- **Undo Tablespace**
+    - Lưu dữ liệu để thực hiện Roll-back
+
+- **Temporary Tablespace**: 
+    - Lưu các dữ liệu tạm thời.
+    - Sẽ xóa khi hết session làm việc.
+
+- **File-per-table Tablespace**
+
+- **General Tablespace**: Các tablespace do user tự tạo.
+
+#### Doublewrite Buffer Files.
+
+- Chỗ chứa tạm khi ghi từ Memory vào Datafile.
+    - Đầu tiên dữ liệu sẽ ghi từ Memory vào Doublewrite Buffer files.
+    - Sau đó InnoDB sẽ ghi dữ liệu từ Doublewrite Buffer Files vào Datafiles.
+
+#### Redo Log
+
+- Đây là bản sao lưu dữ liệu của Log Buffer.
+- Mục đích để phục hồi dữ liệu.
+
+![MySql InnoDB Architech](https://dev.mysql.com/doc/refman/8.4/en/images/innodb-architecture-8-0.png)
+
+## Tối ưu SQL
+
+### Cách xem hiệu năng của câu lệnh và đánh index
+
+- Sử dụng keywword `EXPLAIN`
+
+- Đánh index trên những cột thường dùng filter.
+
+- Sử dung `Explain Analyze` sẽ thực thi câu lệnh và số liệu phân tích thực tế. Trong khi `EXPLAIN` chỉ là dự tính, không thực thi câu lệnh
+
+- Từ MySQL 8 có khái niệm `invisible index`, 
+    - khi index là invisible, index đó sẽ không được sử dụng khi thực thi query.
+    - Sử dụng để test hiệu năng trước khi quyết định `drop index`
+
+### Partition
+
+- Với table từ 2GB hoặc bản ghi từ 10,000,000 trở lên, nên cân nhắc việc sử dụng partition.
+
+- Lưu ý: Khi thiết lập partitions, điều kiện partition phải xuất hiện trong query where. Nếu không query sẽ phải quét toàn bộ partitions.
+
+## Tối ưu tham số.
+
+Các tham số sử dụng để đánh giá tối ưu câu lệnh MySQL
+
+### Tỉ lệ Buffer Cache Hit
+
+
+> **KẾT QUẢ < 90% THÌ CẦN TỐI ƯU**
+
+Công thức:
+
+```sql
+(Innodb_bufer_pool_read_request - Innodb_buffer_pool_reads) * 100 / Innodb_bufer_pool_read_request
+```
+    
+Thông số `Innodb_bufer_pool_read_request`
+
+- Tổng số yêu cầu gửi tới Buffer Pool
+- Lệnh kiểm tra
+```sql
+show global status like '%Innodb_bufer_pool_read_request%'
+```
+
+Thông số `Innodb_buffer_pool_reads`
+
+- Tổng số yêu cầu phải xuống Disk để lấy data do không tìm thấy trong Buffer Pool của Memory.
+- Lệnh:
+```sql
+show global status like '%Innodb_bufer_pool_reads%'
+```
+
+### Tỉ lệ Table Cache Hit
+
+> **TỈ LỆ < 80% THÌ CẦN TỐI ƯU**
+
+Công thức:
+
+```sql
+(Open_tables/Opened_tables) * 100
+```
+
+Thông số `Open_tables`:
+- Tổng số table được open trong Cache
+- Lệnh: 
+```sql
+show global status like 'Open_tables'
+```
+
+Thông số `Opened_tables`:
+- Tổng số table được open
+- Lệnh: 
+```sql
+show global status like 'Opened_tables'
+```
+
+> Hướng tối ưu
+
+- Tối ưu tham số `Table_open_cache`
+- Lệnh 
+```sql
+show variables like 'Table_open_cache'
+```
+- Kiểm tra và tăng tham số `Table_open_cache` khi cần thiết
+
+### Tỉ lệ Table Definition Cache Hit
+
+> **TỈ LỆ < 80% THÌ CẦN TỐI ƯU**
+
+Công thức:
+
+```sql
+(Open Table Definitions/Opened Table Definitions) * 100
+```
+
+Thông số để ra quyết định:
+- Open_table_definitions: Tổng số Table Definitions Trong Cache
+- Opened_table_definitions: Tổng số Table definitions được yêu cầu
+- Lệnh kiểm tra tương tự các lệnh trên
+
+> Hướng tối ưu
+
+- Tối ưu tham số `table_definition_cache`
+- Lệnh 
+```sql
+show variables like 'table_definition_cache'
+```
+- Kiểm tra và tăng tham số `table_definition_cache` khi cần thiết
+
+
+### Thông số sử dụng Temporary Table trên Memory
+
+> **TỈ LỆ < 80% THÌ CẦN TỐI ƯU**
+
+Công thức:
+
+```sql
+((Created_tmp_tables - Created_tmp_disk_tables)/ Created_tmp_tables) * 100
+```
+
+Thông số để ra quyết định:
+- Created_tmp_tables: Tổng số table tmp được tạo
+- Created_tmp_disk_tables: Tổng số table temp đã tạo trên Disk
+- Lệnh kiểm tra tương tự các lệnh trên
+
+> Hướng tối ưu
+
+- Tối ưu chiến lược thực thi câu lệnh SQL.
