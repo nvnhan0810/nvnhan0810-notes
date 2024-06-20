@@ -1,0 +1,110 @@
+---
+title: Hiểu hơn về PHP - Laravel Session
+description: Cơ chế xử lí Session của PHP - Laravel
+date: 2024-06-20
+tags: ["laravel", "session", "php"]
+published: false
+---
+
+Bài viết được dịch và dựa vào bài [Laravel sessions vs PHP session](https://iwasherefirst2.medium.com/how-do-laravel-sessions-work-7b65d74a79a6)
+
+Web application có thể lưu thông tin trên cookie.
+
+**Việc lưu trữ các thông tin nhạy cảm dạng *plain text* là một ý tưởng không tốt**, bởi vì user có thể chỉnh sửa thông tin cookie. Để ngăn chặn điều đó, thông tin thường được lưu trên session, và cookie chỉ lưu thông tin id của session trên server. 
+
+Với mỗi request được thực hiện, thông tin cookie sẽ được gửi kèm theo. Trên server, thông tin session id sẽ được lấy từ cookie và truy cập tương ứng. 
+
+## PHP tạo và quản lí session như thế nào?
+
+PHP cung cấp sẵn các built-in functions và options để quản lí session. Chỉ cần gọi **session_start()** là có thể truy cập các data session thông qua **$_SESSION**
+
+Mặc định session được lưu trong thư mục **/tmp** của server. Có thể tuỳ chỉnh trong file config **php.ini**
+
+Một session có 2 lifetimes. Một là lifetime của session trên server, lifetime còn lại là của cookie chứa session id.
+
+Không thể chỉ định thời gian mà session sẽ bị xoá trên server, nhưng có thể chỉ định thời gian session có thể bị xoá bởi **garbage collector** qua config **session.gc_maxlifetime**
+
+> https://www.php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime
+
+Cookie lifetime được set thông qua config **session.cookie_lifetime**. Giá trị default là 0 (Until the browser closed).
+
+> https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-lifetime
+
+Mặc định, cookie name của PHP session id là **PHPSESSID**. Nếu cookie lifetime là 0, cookie sẽ bị remove khi browser đóng. Trong trường hợp này, giá trị của cột **Expires/Max-Age** sẽ là session
+
+![image](https://miro.medium.com/v2/resize:fit:1358/format:webp/0*KXSU0GC0gR08i-u-.png)
+
+## Laravel quản lí session như thế nào?
+
+Laravel không sử dụng PHP session driver. Thay vào đó, Laravel cung cấp nhiều drivers khác nhau. 
+
+Trong khi các functions và options session của PHP được viết bằng C, Laravel handle session bằng PHP và quản lí config trong `config/session.php`
+
+**Các session storage drivers trong Laravel:**
+
+- Database
+- File
+- Cookie
+- Memcache
+- PHP array
+- AWS dynamoDB
+
+**Cookie driver** lưu data được **hashed** trong cookie. Không lưu data trên server. 
+
+**File driver** mặc định được lưu trong folder **storage/framework/sessions/**. Có thể tuỳ chỉnh qua option
+
+```php
+'files' => storage_path('framework/sessions')
+```
+
+## Laravel quản lí session duration
+
+Thông qua các config
+
+```php
+'lifetime' => 120,
+'expire_on_close' => false,
+```
+
+Nếu `expire_on_close` là true, cột `Expires/Max-Age` từ cookies sẽ được set là Session và sẽ được remove khi browser đóng. 
+
+Nếu `expire_on_close` là false, cookie lifetime sẽ là time hiện tại cộng thêm lifetime chỉ định. Thời gian expire sẽ hiện ở cột `Expires/Max-Age`.
+
+![Expire](https://miro.medium.com/v2/resize:fit:1298/format:webp/0*rg31JIcSq3vIHJpu.png)
+
+Tên default trong Laravel cookie là `laravel_session`. Có thể thay đổi trong config
+
+```php
+'cookie' => env(
+    'SESSION_COOKIE',
+    str_slug(env('APP_NAME', 'laravel'), '_') . '_session'
+),
+```
+
+## Laravels Garbage Collector
+
+Với mỗi request, sẽ có phần trăm **garbage collector** được thực thi. Chỉ khi **garbage collector** chạy, tất cả các sessions cũ hết hạn mới được dọn dẹp.
+
+Garbage collector là một pattern được sử dụng bởi PHP session navtive.  Laravel Garbage Collector được viết như 1 PHP class.
+
+> https://github.com/laravel/framework/blob/8.x/src/Illuminate/Session/Middleware/StartSession.php#L170-L180
+
+Điều này có nghĩa là nếu không có request nào vào website, các session cũ sẽ không được dọn dẹp.
+
+**Xác suất Garbage Collector chạy là 2%**. 
+
+=> Xác suất Garbage Collector chạy ở 50 request đầu tiên là 64%, 100 request đầu tiên là 87%.
+
+Có thể config qua key `lottery`
+
+```php
+'lottery' => [2, 100]
+```
+
+## Remember me khi login hoạt động thế nào?
+
+Khi user login với option `remember me`, user sẽ được login mãi đến khi logout. 
+
+Cơ chế là 1 token sẽ được và lưu trong db lẫn cookie (cần hashed khi lưu cookie).
+
+Khi user mở browser và session login hết hạn. Token sẽ được compare giữa cookie và DB. Nếu token 
