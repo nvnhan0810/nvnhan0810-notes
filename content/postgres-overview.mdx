@@ -1,0 +1,60 @@
+---
+title: Tổng quan kiến trúc về PostgreSQL  
+description: Tổng hợp kiến trúc về PostgreSQL
+date: 2024-06-21
+tags: ["postgresql", "database"]
+published: true
+---
+
+## Kiến trúc PostgreSQL
+
+Database Cluster
+
+- Là một tập các database trên 1 PostgreSQL Server
+
+Database
+
+Schema
+
+Objects
+- Table
+- Index
+- Trigger
+- ...
+
+Các database object được quản lí bằng OID
+
+## Kiến trúc vật lý
+
+Database cluster có 1 đường dẫn tổng gọi là `Base Directory`
+
+Trong đường dẫn `Base directory` sẽ có các files và sub folders quan trọng.
+
+Các files:
+
+- Các file cấu hình kết nối: 
+    - **pg_hfa**: host-based authentication
+    - **pg_indent.conf**: Chứa file mapping
+- File thông tin cơ bản:
+    - **PG_VERSION**: Lưu thông tin phiên bản CSDL
+    - **current_logfiles**: Thông tin log hiện tại
+    - Thông tin của tiến trình postmasster:
+        - postmaster.opts 
+        - postmaster.pid
+- Các file tham số cấu hình hoạt động của database:
+    - **postgresql.conf**: Lưu thông tin cấu hình 
+    - **postgresql.auto.conf**
+        - Khi chúng ta gõ lệnh `ALTER SYSTEM` để thay đổi thông tin, hệ thống sẽ tự động cập nhật giá trị tham số đó vào file này.
+        - Giá trị tham số ở file `postgresql.auto.conf` sẽ ghi đè tham số tại file `postgresql.conf`
+
+Các sub folders:
+
+- **base**: Mỗi sub folder chứa các database.
+- **globals**: Chứa các bảng thuộc cluster (dùng chung)
+- **log**: Chứa thông tin log, sử dụng để kiểm tra các trường hợp sự cố.
+-**pg_wal**: Chứa WAL segment files.
+
+Tablespace:
+
+- pg_global: Lưu các object của hệ thống
+- pg_default: Lưu các object khác
