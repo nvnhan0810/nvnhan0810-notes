@@ -1,0 +1,17 @@
+---
+title: Obsever Design Pattern  
+description: Tìm hiểu về Obsever Design Pattern
+date: 2024-06-25
+tags: ["design pattern", "software design"]
+published: false
+---
+
+## Intent 
+
+Obsever là design pattern thuộc nhóm **Behavior**.
+
+Obsever dùng để notify tới các objects khi có sự kiện xảy ra mà object đã đăng ký. 
+
+Tạo ra mối quan hệ one-to-many giữa các objects để khi một object change state, tất cả các object phụ thuộc sẽ được notify và update tự động. 
+
+Đóng gói phần core components trong một `Subject abstraction`, và giá trị (or optional hoặc user interface) nằm trong Obsever hierarchy.
