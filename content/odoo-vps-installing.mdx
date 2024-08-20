@@ -1,0 +1,169 @@
+---
+title: How to set up Odoo on Ubuntu 22.04 VPS
+description: Install odoo on VPS with Ubuntu 22.04
+date: 2024-08-20
+tags: ["odoo", "ubuntu", "vps"]
+published: true
+---
+
+## Step 1: Install Python 3.12 and dependencies
+
+```bash
+sudo apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        dirmngr \
+        fonts-noto-cjk \
+        gnupg \
+        libssl-dev \
+        xz-utils \
+        build-essential \
+        libldap2-dev \
+        libsasl2-dev \
+        libpq-dev
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+
+sudo apt-get update
+
+sudo apt-get install python3.12 python3.12-venv python3.12-dev
+
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
+```
+
+## Step 2: Create an Odoo user
+
+```bash
+sudo useradd -m -d /opt/odoo -U -r -s /bin/bash odoo
+```
+
+## Step 3: Install PostgreSQL 16
+
+```bash
+sudo apt install gnupg2 wget
+
+# Add PostgreSQL 16 respository
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import Signing Key
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+
+sudo apt update
+
+sudo apt install postgresql-16 postgresql-contrib-16 postgresql-client-16
+
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Create User Postgres for odoo
+sudo su - postgres -c "createuser -s odoo"
+```
+
+Set password for **postgres** user
+
+```bash
+sudo -u postgres psql
+```
+
+```sql
+ALTER USER postgres PASSWORD 'your_password';
+```
+
+## Step 4: Installing wkhtmltopdf
+
+```bash
+sudo apt-get update && sudo apt-get -y install wkhtmltopdf
+```
+
+## Step 5: Download and Config Odoo
+
+Change to user **odoo**
+
+```bash
+sudo su - odoo
+```
+Download Odoo 17
+
+```bash
+git clone https://www.github.com/odoo/odoo --depth 1 --branch 17.0 /opt/odoo/odoo
+```
+
+To separate Odoo’s Python modules from the system’s Python modules, we’ll need to set up a Python Virtual Environment inside which we’ll install Odoo. Use these commands to achieve this.
+
+```bash
+cd /opt/odoo
+
+python3.12 -m venv odoo-venv
+```
+
+Then we activate the virtual environment.
+
+```bash
+source odoo-venv/bin/activate
+```
+
+## Step 6: Install Odoo Dependencies
+
+```bash
+pip3.12 install wheel
+pip3.12 install -r odoo/requirements.txt
+```
+
+Deactivate Python venv
+
+```bash
+deactivate
+```
+
+## Step 7: Create Odoo config file
+
+Create file at **/opt/odoo/odoo.conf**
+
+```text
+[options]
+; This is the password that allows database operations:
+admin_passwd = my_admin_passwd
+db_host = False
+db_port = False
+db_user = odoo
+db_password = False
+xmlrpc_port = 8060
+logfile = /var/log/odoo/odoo.log
+logrotate = True
+addons_path = /opt/odoo/odoo/addons,/opt/odoo/odoo-custom-addons
+```
+
+## Step 8: Creating Systemd Unit File
+
+Create file service
+
+```bash
+sudo touch /etc/systemd/system/odoo.service
+```
+
+Add the following configuration information to the file.
+
+```text
+[Unit]
+Description=Odoo
+Requires=postgresql.service
+After=network.target postgresql.service
+
+
+[Service]
+Type=simple
+SyslogIdentifier=odoo
+PermissionsStartOnly=true
+User=odoo
+Group=odoo
+ExecStart=/opt/odoo/odoo-venv/bin/python3 /opt/odoo/odoo/odoo-bin -c /opt/odoo/odoo.conf
+StandardOutput=journal+console
+
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## Step 9: Create Reverse Proxy Nginx
+
+Create reverse proxy from nginx port 80 to 8060
