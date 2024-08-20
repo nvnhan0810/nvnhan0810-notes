@@ -1,12 +1,12 @@
-import { posts } from "#site/content";
-import { MDXContent } from "@/components/mdx-components";
-import { notFound } from "next/navigation";
+import {posts} from "#site/content";
+import {MDXContent} from "@/components/mdx-components";
+import {notFound} from "next/navigation";
 
-import { Tag } from "@/components/tag";
-import { siteConfig } from "@/config/site";
-import { isAdmin } from "@/lib/auth";
+import {Tag} from "@/components/tag";
+import {siteConfig} from "@/config/site";
 import "@/styles/mdx.css";
-import { Metadata } from "next";
+import {Metadata} from "next";
+
 interface PostPageProps {
   params: {
     slug: string[];
@@ -15,16 +15,7 @@ interface PostPageProps {
 
 async function getPostFromParams(params: PostPageProps["params"]) {
   const slug = params?.slug?.join("/");
-  const post = posts.find((post) => post.slug === slug);
-
-  if (await isAdmin() && post) {
-    return {
-      ...post,
-      published: true,
-    };
-  }
-
-  return post;
+  return posts.find((post) => post.slug === slug);
 }
 
 export async function generateMetadata({
@@ -32,7 +23,7 @@ export async function generateMetadata({
 }: PostPageProps): Promise<Metadata> {
   const post = await getPostFromParams(params);
 
-  if (!post || (await isAdmin() && !post.published)) {
+  if (!post) {
     return {};
   }
 
@@ -75,7 +66,7 @@ export async function generateStaticParams(): Promise<
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
 
-  if (!post || (!(await isAdmin()) && !post?.published)) {
+  if (!post) {
     notFound();
   }
 

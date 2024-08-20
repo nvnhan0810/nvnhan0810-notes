@@ -1,9 +1,7 @@
 import { posts } from "#site/content";
 import { Tag } from "@/components/tag";
-import { authOptions } from "@/lib/auth";
 import { getAllTags, sortTagsByCount } from "@/lib/utils";
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
 
 export const metadata: Metadata = {
   title: "Tags",
@@ -11,9 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TagsPage() {
-  const auth = await getServerSession(authOptions);
-  
-  const tags = getAllTags(posts, !!auth?.user);
+  const tags = getAllTags(posts);
   const sortedTags = sortTagsByCount(tags);
 
   return (
