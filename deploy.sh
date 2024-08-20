@@ -2,6 +2,8 @@
 
 set -e
 
+git pull origin main
+
 fnm use
 
 npm install -g pnpm
