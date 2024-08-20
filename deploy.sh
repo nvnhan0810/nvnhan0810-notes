@@ -19,5 +19,5 @@ if [ $PM2_EXIST = Yes ]; then
 	pm2 delete nvnahn0810-notes
 fi
 
-pm2 --name nvnahn0810-notes start pnpm -- start
+pm2 --name nvnahn0810-notes start pnpm -- start -p 3002
 
