@@ -1,0 +1,115 @@
+---
+title: Cài đặt debug Odoo với Vscode và Docker
+description: Hướng dẫn setup debug Odoo trên vscode với Docker
+date: 2024-10-21
+tags: ["odoo", "vscode", "python", "python-debugpy"]
+published: true
+---
+
+## Setup Odoo với Dockerfile
+
+Dựa vào github [Odoo Docker file](https://github.com/odoo/docker/tree/master/18.0) để setup docker local.
+
+Trong file Dockerfile, cài thêm package **python-debugpy** qua lệnh:
+
+```bash
+RUN pip3 install debugpy --break-system-packages
+```
+
+Với file [entrypoint.sh](https://github.com/odoo/docker/blob/master/18.0/entrypoint.sh), update nội dung với **debugpy**:
+
+```bash
+#!/bin/bash
+
+set -e
+
+if [ -v PASSWORD_FILE ]; then
+    PASSWORD="$(< $PASSWORD_FILE)"
+fi
+
+# set the postgres database host, port, user and password according to the environment
+# and pass them as arguments to the odoo process if not present in the config file
+: ${HOST:=${DB_PORT_5432_TCP_ADDR:='db'}}
+: ${PORT:=${DB_PORT_5432_TCP_PORT:=5432}}
+: ${USER:=${DB_ENV_POSTGRES_USER:=${POSTGRES_USER:='odoo'}}}
+: ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
+
+DB_ARGS=()
+function check_config() {
+    param="$1"
+    value="$2"
+    if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then       
+        value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" |cut -d " " -f3|sed 's/["\n\r]//g')
+    fi;
+    DB_ARGS+=("--${param}")
+    DB_ARGS+=("${value}")
+}
+check_config "db_host" "$HOST"
+check_config "db_port" "$PORT"
+check_config "db_user" "$USER"
+check_config "db_password" "$PASSWORD"
+
+case "$1" in
+    -- | odoo)
+        shift
+        if [[ "$1" == "scaffold" ]] ; then
+            exec /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo "$@"
+        else
+            wait-for-psql.py ${DB_ARGS[@]} --timeout=30
+            exec /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo "$@" "${DB_ARGS[@]}"
+        fi
+        ;;
+    -*)
+        wait-for-psql.py ${DB_ARGS[@]} --timeout=30
+        exec /usr/bin/python3 -m debugpy --listen 0.0.0.0:8888 /usr/bin/odoo "$@" "${DB_ARGS[@]}"
+        ;;
+    *)
+        exec "$@"
+esac
+
+exit 1
+```
+
+Run docker để start Odoo và truy cập thành công qua: **localhost:8069**
+
+Thêm lệnh **chmod +x duong_dan** nếu có lỗi **Permission Denied**
+
+## Setup Vscode
+
+Cài các extension **[Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)** và **[Python Debugger](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy)**
+
+Ở sidebar bên trái, chọn Tab **Run And Debug > Create new launch.json file**
+
+Chọn **Python Debugger > Nhập URL: localhost > Nhập port: 8888**
+
+Sau khi kết thúc, file launch.json có nội dung như sau:
+
+```bash
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Odoo: Run And Debug",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 8888,
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/extra-addons",
+                    "remoteRoot": "/mnt/extra-addons"
+                }
+            ]
+        }
+    ]
+}
+```
+
+Nhấn icon Run, đặt breakpoint và test thử debug.
+
+Có thể tham khảo toàn bộ [nội dung ở đây.](https://github.com/nvnhan0810/notes-content/tree/main/vscode-odoo-debugpy)
