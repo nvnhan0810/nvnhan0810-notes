@@ -1,0 +1,36 @@
+---
+title: Cách tự động restart Odoo khi thay đổi code
+description: Hướng dẫn config tự động restart server Odoo khi thay đổi code với watchdog
+date: 2024-10-28
+tags: ["odoo", "python-watchdog"]
+published: true
+---
+
+## Step 1: Cài đặt package watchdog
+
+```bash
+pip3.12 install watchdog
+```
+
+## Step 2: Sửa tham số khi start server Odoo
+
+Khi start server Odoo, thêm tham số `--dev` với giá trị
+
+```bash
+--dev reload
+```
+
+Trường hợp muốn tự động load view từ xml khi dev thì sửa giá trị thành
+
+```bash 
+--dev all
+```
+
+Khởi động lại server, check log có các dòng sau là thành công:
+
+```bash
+2024-10-28 11:50:30 2024-10-28 04:50:30,087 1 INFO ? odoo.service.server: Watching addons folder /usr/lib/python3/dist-packages/odoo/addons 
+2024-10-28 11:50:30 2024-10-28 04:50:30,087 1 INFO ? odoo.service.server: Watching addons folder /var/lib/odoo/addons/18.0 
+2024-10-28 11:50:30 2024-10-28 04:50:30,087 1 INFO ? odoo.service.server: Watching addons folder /mnt/extra-addons 
+2024-10-28 11:50:30 2024-10-28 04:50:30,464 1 INFO ? odoo.service.server: AutoReload watcher running with watchdog 
+```
