@@ -7,6 +7,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up SSH private key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          touch ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Configure SSH
+        run: |
+          touch ~/.ssh/config
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          touch ~/.ssh/known_hosts
+          echo "$SSH_HOST $SSH_KEY" > ~/.ssh/known_hosts
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
