@@ -1,0 +1,120 @@
+---
+title: Atomic Lock Trong Laravel  
+description: Atomic Lock Trong Laravel
+date: 2024-06-06
+tags: ["laravel", "lock"]
+published: true
+---
+
+> Atomic Lock là một cơ chế giúp giải quyết tình trạng hai hay nhiều request gọi đến cùng một lúc và thay đổi giá trị đồng thời làm kết quả xử lý cuối cùng bị sai (Tình trạng này gọi là Race condition requests)
+
+> Để sử dụng được tính năng này, **Config Cache** phải sử dụng các driver **memcached, redis, dynamodb, database, file, hoặc array**
+
+### Ví dụ về Race Condition
+
+Một hệ thống booking khách sạn chỉ cho phép 1 phòng được book bởi 1 user, 2 user khác nhau không thể book cùng 1 phòng trong 1 khoảng thời gian. 
+
+Code xử lý thông thường trong Controller
+```php
+public function booking(Request $request) {
+    // Check booking với phòng tương ứng đã có chưa
+    $checkBooking = Booking::where('room_id', $request->room_id)
+              / Kiểm tra time đặt phòng
+              ->where(...)
+              ->exists();
+
+    if ($checkBooking) {
+       // Response không thể đặt phòng
+       ...
+    }
+    
+    // Handle logic đặt phòng.
+}
+```
+
+**Vấn đề**
+
+Khi hai user cùng truy cập và click đặt phòng cùng lúc. Bởi hệ thống được setup run với **php-fpm trên nhiều worker khác nhau** nên:
+
+> - Request đặt phòng 1 tới và check booking có thể diễn ra.
+> - Trong lúc request 1 đang xử lí tạo booking. 
+> - Request 2 tới và check booking vẫn có thể diễn ra. *Vì request 1 mới check booking, chưa commit booking vào db*
+> - Request 2 xử lý tạo booking
+> - **Kết quả có 2 booking trùng phòng được tạo**
+
+**<strong>Giờ là lúc Atomic Lock cần được sử dụng</strong>**
+
+## Quản lý Lock
+
+Chúng ta có thể tạo và quản lý locks sử dụng bằng method `Cache::lock`
+
+```php
+use Illuminate\Support\Facades\Cache;
+ 
+$lock = Cache::lock('foo', 10);
+ 
+if ($lock->get()) {
+    // Lock acquired for 10 seconds...
+ 
+    $lock->release();
+}
+```
+
+Có thể sử dụng `Callback function` trong method `get`
+
+```php
+Cache::lock('foo', 10)->get(function () {
+    // Lock acquired for 10 seconds and automatically released...
+});
+```
+
+##  Quản lý Lock với các Processes
+
+Đôi khi chúng ta cần yêu cầu và release lock trong 1 process khác. 
+
+**Ví dụ:** Lock được khởi tạo khi 1 request đến và sẽ được đưa vào cùng 1 Queue Job. Khi job được handle xong sẽ release lock được tạo trước đó.
+
+```php
+$podcast = Podcast::find($id);
+ 
+$lock = Cache::lock('processing', 120);
+ 
+if ($lock->get()) {
+    ProcessPodcast::dispatch($podcast, $lock->owner());
+}
+```
+
+Trong `ProcessPodcast`, lock có thể khôi phục và release:
+
+```php
+Cache::restoreLock('processing', $this->owner)->release();
+```
+
+Có thể **bắt buộc** release 1 lock với method `forceRelease` 
+
+```php
+Cache::lock('processing')->forceRelease();
+```
+
+## Giải quyết ví dụ ban đầu.
+
+```php
+public function booking(Request $request) {
+    Cache::lock('booking', 10)->get(function () use ($request) {
+        // Check booking với phòng tương ứng đã có chưa
+        $checkBooking = Booking::where('room_id', $request->room_id)
+        / Kiểm tra time đặt phòng
+        ->where(...)
+        ->exists();
+
+        if ($checkBooking) {
+        // Response không thể đặt phòng
+        ...
+        }
+
+        // Handle logic đặt phòng.
+    });
+}
+```
+
+Khi `Request 2` gọi tới, Vì `Request 1` đang giữ `Lock booking` nên `Request 2` sẽ phải đợi **maximum 10s** rồi mới handle logic kiểm tra và booking.
