@@ -2,7 +2,7 @@ import {posts} from "#site/content";
 import {PostItem} from "@/components/post-item";
 import {Tag} from "@/components/tag";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {getAllTags, getPostsByTagSlug, sortTagsByCount} from "@/lib/utils";
+import {getAllTags, getPostsByTagSlug, sortTagsByCount, titleCase} from "@/lib/utils";
 import {slug} from "github-slugger";
 import {Metadata} from "next";
 
@@ -40,7 +40,7 @@ export default async function TagPage({ params }: TagPageProps) {
       <div className="flex flex-col items-start gap-4 md:flex-row md:justify-between md:gap-8">
         <div className="flex-1 space-y-4">
           <h1 className="inline-block font-black text-4xl lg:text-5xl capitalize">
-            {title}
+            {titleCase(title)}
           </h1>
         </div>
       </div>
