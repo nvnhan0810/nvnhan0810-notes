@@ -1,0 +1,140 @@
+---
+title: "React Native: Hướng dẫn setup FacebookSDK với package react-native-fbsdk-next"
+description: "React Native: Hướng dẫn setup FacebookSDK với package react-native-fbsdk-next"
+date: 2025-03-14
+tags: ["react native", "FacebookSDK"]
+published: true
+---
+
+## Cài đặt package
+
+```bash
+npm i react-native-fbsdk-next
+```
+
+## Tạo app trên Meta Developer
+
+Tạo app trên page https://developers.facebook.com/
+
+Trong mục `App Settings > Basic`, Thêm các platform tương ứng với Android và IOS App
+
+## Cấu hình source Android  
+
+Tham khảo [hướng dẫn này](https://developers.facebook.com/docs/android/getting-started/)
+
+1. Mở file `android > app > build.gradle` thêm vào mục `dependencies` nội dung:
+
+```text
+implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+```
+
+2. Mở file `MainApplication.kt` trong `android/app/src/main` và thêm vào nội dung
+
+```kotlin
+...
+import com.facebook.FacebookSdk
+...
+
+class MainApplication : Application(), ReactApplication {
+
+...
+
+    override fun onCreate() {
+        super.onCreate()
+         ....
+        FacebookSdk.sdkInitialize(applicationContext)
+        .....
+    }
+
+...
+
+}
+```
+
+3. Mở file `android/app/src/main/res/values/strings.xml` và thêm vào nội dung:
+
+```xml
+<string name="facebook_app_id">1234</string>
+<string name="facebook_client_token">56789</string>
+```
+
+Thông tin chính xác lấy từ apps đã đăng ký trên Meta Developers xuống.
+
+4. Mở file `android/app/manifests/AndroidManifest.xml`, thêm vào các nội dung sau:
+
+```xml
+<application android:label="@string/app_name" ...>
+    ...
+    <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+    <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+    ...
+</application>
+```
+
+Mục `use-permissions` sau `application` thêm vào 
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+Chạy app trên thiết bị và test lại
+
+```bash
+npx expo run:android --device
+```
+
+## Cấu hình source IOS
+
+1. Vào thư mục `ios` và chạy lệnh 
+
+```bash
+pod install
+```
+
+Mở file `Info.plist` thêm vào các key sau
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+  <key>CFBundleURLSchemes</key>
+  <array>
+    <string>fbAPP-ID</string>
+  </array>
+  </dict>
+</array>
+<key>FacebookAppID</key>
+<string>APP-ID</string>
+<key>FacebookClientToken</key>
+<string>CLIENT-TOKEN</string>
+<key>FacebookDisplayName</key>
+<string>APP-NAME</string>
+```
+
+2. Bên mục `Targets > Signin and Capabilities`, Nhấn `+ Capabilities` và thêm vào `Keychain Sharing` capability
+
+3. Mở file `AppDelegate.mm`, thêm vào nội dung `#import` và trong hàm `didFinishLaunchingWithOptions`
+
+```swift
+#import <AuthenticationServices/AuthenticationServices.h>
+#import <SafariServices/SafariServices.h>
+#import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  ...
+
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                    didFinishLaunchingWithOptions:launchOptions];
+  
+  ...
+}
+```
+
+4. Chạy lệnh run app trên thiết bị và kiểm tra
+
+```bash
+npx expo run:ios --device
+```
+
+Còn lại setup Login với Facebook hay gì thì tham khảo [doc](https://github.com/thebergamo/react-native-fbsdk-next)

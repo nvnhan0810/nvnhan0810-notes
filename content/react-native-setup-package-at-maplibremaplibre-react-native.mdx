@@ -1,0 +1,82 @@
+---
+title: "[React Native] Setup package @maplibre/maplibre-react-native"
+description: "Hướng dẫn setup package @maplibre/maplibre-react-native và fix lỗi khi Archive trên IOS"
+date: 2025-03-14
+tags: ["react native", "FacebookSDK"]
+published: true
+---
+
+## Cài đặt package
+
+```bash
+npm i @maplibre/maplibre-react-native
+```
+
+## Setup IOS
+
+Mở file `ios/Podfile`, thêm vào config:
+
+
+```ruby
+...
+post_install do |installer|
+
+  $MLRN.post_install(installer)
+
+  react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
+    )
+    ...
+end
+...
+```
+
+## Lỗi khi Archive trên IOS
+
+Khi Archive app bằng Xcode để release hoặc đẩy TestFlight, có thể bị lỗi 
+
+```text
+“MapLibre.xcframework-ios.signature” couldn’t be copied to “Signatures” because an item with the same name already exists.
+Domain: NSCocoaErrorDomain
+Code: 516
+Failure Reason: A file with the name “MapLibre.xcframework-ios.signature” already exists.
+Recovery Suggestion: To save the file, either provide a different name, or move aside or delete the existing file, and try again.
+User Info: {
+    DVTErrorCreationDateKey = "2025-03-24 15:41:26 +0000";
+    NSDestinationFilePath = "/Users/nvnhan/Library/Developer/Xcode/Archives/2025-03-24/bescoapp 24-3-25, 22.41.xcarchive/Signatures/MapLibre.xcframework-ios.signature";
+    NSFilePath = "/Users/nvnhan/Library/Developer/Xcode/DerivedData/bescoapp-cjknerqepidlfdamfttygginrzzn/Build/Intermediates.noindex/ArchiveIntermediates/bescoapp/BuildProductsPath/Release-iphoneos/maplibre-react-native/MapLibre.xcframework-ios.signature";
+    NSSourceFilePathErrorKey = "/Users/nvnhan/Library/Developer/Xcode/DerivedData/bescoapp-cjknerqepidlfdamfttygginrzzn/Build/Intermediates.noindex/ArchiveIntermediates/bescoapp/BuildProductsPath/Release-iphoneos/maplibre-react-native/MapLibre.xcframework-ios.signature";
+    NSURL = "file:///Users/nvnhan/Library/Developer/Xcode/DerivedData/bescoapp-cjknerqepidlfdamfttygginrzzn/Build/Intermediates.noindex/ArchiveIntermediates/bescoapp/BuildProductsPath/Release-iphoneos/maplibre-react-native/MapLibre.xcframework-ios.signature";
+    NSUserStringVariant =     (
+        Copy
+    );
+}
+--
+The operation couldn’t be completed. File exists
+Domain: NSPOSIXErrorDomain
+Code: 17
+Failure Reason: File exists
+--
+
+
+System Information
+
+macOS Version 15.3.1 (Build 24D70)
+Xcode 16.2 (23507) (Build 16C5032a)
+Timestamp: 2025-03-24T22:41:26+07:00
+```
+
+### Cách Fix
+
+- Ở Target app trên Xcode, Mở tab `Build Phases`, add thêm 1 build phase `Run Script` với nội dung
+
+```ruby
+  rm "$BUILD_DIR/Release-iphoneos/MapLibre.xcframework-ios.signature"
+```
+
+Nhớ check select `For install builds only`
+
+- Chạy lại app và thử Archive lại để kiểm tra.

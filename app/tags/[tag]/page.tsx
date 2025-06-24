@@ -17,7 +17,7 @@ export async function generateMetadata({
 }: TagPageProps): Promise<Metadata> {
   const { tag } = params;
   return {
-    title: tag,
+    title: titleCase(tag),
     description: `Posts on the topic of ${tag}`,
   };
 }
