@@ -6,10 +6,7 @@ tags: ["github-actions", "laravel", "php"]
 published: true
 ---
 
-
 > Bài viết này không đề cập đến khái niệm CI/CD. Chỉ đơn giản các step setup để deploy dự án Laravel lên VPS với Github Actions.
-
-  
 
 ### Bước 1: Setup file .env cho production
 
@@ -25,7 +22,7 @@ Cài đặt các giá trị secret trên **github secrets** trong repository. C�
 
 Trong source, tạo file config đuôi yml cho github actions với đường dẫn **./githubs/workflows/deploy.yml**
 
-> Ở đây chỉ tạo file build.yml để config đơn giản cho việc deploy, không đề cập đến các setup workflows khác. Các khái niệm khác sẽ ở bài note khác (hên xuôi)... ::))
+> Ở đây chỉ tạo file build.yml để config đơn giản cho việc deploy, không đề cập đến các setup workflows khác. Các khái niệm khác sẽ ở bài viết khác.
 
 Nội dung file config:
 ```yaml
@@ -123,6 +120,6 @@ jobs:
             chown -R www-data:www-data /var/www/html/it-backend/src
 ```
 
-Nội dung trên nhìn thì chắc đa số ai cũng hiểu. Mình không giải thích thêm..
+Nội dung trên nhìn thì chắc đa số ai cũng hiểu. Xin phép không giải thích thêm..
 
 Push lên nhánh main và check thành quả ở mục **Tab Actions** trên repository, nếu có lỗi thì fix..

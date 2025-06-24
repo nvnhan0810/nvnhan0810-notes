@@ -1,0 +1,35 @@
+---
+title: React Native: Cài đặt package @notifee/react-native config Notifications  
+description: Hướng dẫn cài đặt package @notifee/react-native
+date: 2025-03-14
+tags: ["react native", "firebase messaging"]
+published: true
+---
+
+## Cài đặt package 
+
+```bash
+npm i @notifee/react-native
+```
+
+## Setup cho android
+
+Mở file `android/build.gradle` Thêm vào key `allprojects > repositories` nội dung 
+
+```json 
+ maven {
+    url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+}
+```
+
+## Setup với IOS
+
+Chạy lệnh 
+
+```bash
+cd ios && pod install
+```
+
+Về cách sử dụng thì tham khảo doc nha.
+
+https://docs.page/invertase/notifee/react-native/overview
