@@ -1,0 +1,142 @@
+
+---
+title: "[Proxmox] Cài đặt và tạo template Ubuntu Cloud Init trong Proxmox"
+description: Cài đặt và tạo template Ubuntu Cloud Init trong Proxmox
+date: 2025-07-04
+tags: ["system", "devops", "proxmox"]
+published: true
+---
+
+## Add Ubuntu Cloud Image vào Proxmox 
+
+Từ page https://cloud-images.ubuntu.com/ chọn file cloud image, copy link
+
+Trên proxmox web GUI, Chọn `node mong muốn > local > ISO > Download from URL`
+
+## Tạo template Proxmox
+
+SSH vào terminal proxmox host. Tạo VM và convert thành template
+
+- Tạo một VM mới với ID 9000, đặt tên là ubuntu-24.04-cloud, cấp 2GB RAM, và gắn card mạng kiểu virtio nối với bridge vmbr0.
+
+```bash
+qm  create  9000  --name  ubuntu-24.04-cloud  --memory  2048  --net0  virtio,bridge=vmbr0
+```
+
+- Import file cloud image (.img) vào VM 9000 lên storage local-lvm.
+- Sau lệnh này, một disk mới sẽ xuất hiện trong VM nhưng chưa được gắn vào controller nào.
+
+```bash
+qm  importdisk  9000  ubuntu-24.04-cloudimg-amd64.img  local-lvm
+```
+
+- Gắn disk vừa import vào controller SCSI của VM, sử dụng loại controller virtio-scsi-pci.
+- Disk sẽ được gắn vào vị trí scsi0.
+
+```bash
+qm  set  9000  --scsihw  virtio-scsi-pci  --scsi0  local-lvm:vm-9000-disk-0
+```
+
+-  Tạo một ổ đĩa cloud-init (dùng để truyền thông tin user, network, ssh key...) và gắn vào vị trí ide2 của VM.
+
+```bash
+qm  set  9000  --ide2  local-lvm:cloudinit
+```
+
+- Thiết lập VM boot từ ổ đĩa SCSI (disk cloud image vừa gắn ở bước 3).
+
+```bash
+qm  set  9000  --boot  c  --bootdisk  scsi0
+```
+
+- Bật console serial (giúp cloud image hoạt động tốt hơn, nhất là với cloud-init) và thiết lập VGA qua serial.
+
+```bash
+qm  set  9000  --serial0  socket  --vga  serial0
+```
+
+-  Chuyển VM 9000 thành template.
+
+```bash
+qm  template  9000
+```
+
+## Clone Template thành VM
+
+- Clone template thành VM mới
+
+```bash
+qm clone <TEMPLATE_ID> <NEW_VM_ID> --name <VM_NAME> --full true
+
+# Example: qm clone 9000 100 --name my-ubuntu-vm --full true
+```
+
+- Cấu hình cloud-init
+
+Cấu hình user và password:
+
+```bash
+qm set <VM_ID> --ciuser <USERNAME> --cipassword <PASSWORD>
+
+# Ex: qm set 100 --ciuser myuser --cipassword MySecretPassword123
+```
+
+Cấu hình SSH public key:
+
+```bash
+qm set <VM_ID> --sshkey <PATH_TO_PUBLIC_KEY>
+
+# Ex: qm set 100 --sshkey ~/.ssh/id_rsa.pub
+```
+
+Cấu hình hostname:
+
+```bash
+qm set <VM_ID> --cihostname <HOSTNAME>
+
+# Example:  qm set 100 --cihostname my-ubuntu-vm
+```
+
+Cấu hình network (DHCP):
+
+```bash
+qm set <VM_ID> --ipconfig0 ip=dhcp
+
+# Example: qm set 100 --ipconfig0 ip=dhcp
+```
+
+Cấu hình network (Static IP):
+
+```bash
+qm set <VM_ID> --ipconfig0 ip=<IP_ADDRESS>/<SUBNET>,gw=<GATEWAY>
+
+# Ex: qm set 100 --ipconfig0 ip=192.168.1.100/24,gw=192.168.1.1
+```
+
+-  Cấu hình thêm (tùy chọn)
+
+Cấu hình hardware
+
+```bash
+qm set <VM_ID> --cores <CPU_CORES> --memory <RAM_MB>
+
+# Example: qm set 100 --cores 2 --memory 2048
+```
+
+Cấu hình disk size:
+
+```bash
+qm resize <VM_ID> scsi0 <SIZE>
+
+# Ex: qm resize 100 scsi0 20G
+```
+
+-  Khởi động VM
+
+```bash
+qm start <VM_ID>
+
+# Example: qm start 100
+```
+
+Connect vào VM và check xem đã được tự động install theo các tham số
